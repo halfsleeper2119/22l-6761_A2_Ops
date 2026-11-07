@@ -1,0 +1,13 @@
+# Development / training environment (the Docker image gets its own slimmer list later)
+tensorflow>=2.16,<2.21
+keras-tuner
+mlflow
+dagshub
+dvc
+numpy
+pandas
+pillow
+matplotlib
+scikit-learn
+python-dotenv
+flask

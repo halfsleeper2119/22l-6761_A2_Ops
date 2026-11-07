@@ -1,0 +1,24 @@
+# Secrets - never commit
+.env
+kaggle.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local experiment tracking
+mlruns/
+mlartifacts/
+
+# Model binaries (versioned with MLflow / DVC instead of Git)
+models/*.keras
+*.h5
+
+# Misc
+.ipynb_checkpoints/
+.DS_Store
+
+# NOTE: data/raw and data/clean are NOT listed here on purpose.
+# `dvc add` writes its own data/.gitignore for them.
