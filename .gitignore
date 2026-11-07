@@ -16,6 +16,9 @@ mlartifacts/
 models/*.keras
 *.h5
 
+# Keras Tuner trial folders
+tuner/
+
 # Misc
 .ipynb_checkpoints/
 .DS_Store

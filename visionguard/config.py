@@ -20,6 +20,14 @@ LABEL_OF = {name: i for i, name in enumerate(CLASSES)}
 # Images smaller than this on either side carry too little signal and are dropped.
 MIN_SIDE = 32
 
+# Training defaults (each can be overridden on the command line of scripts/train.py)
+IMG_SIZE = 160          # 160x160: MobileNetV2 has ImageNet weights for it; ~2x faster than 224 on CPU
+BATCH_SIZE = 32
+MODELS_DIR = ROOT / "models"
+RUNS_DIR = REPORTS / "runs"            # local copy of every run's figures and metrics
+REGISTERED_MODEL_NAME = "22l-6761_A2_Ops_visionguard"
+MLFLOW_EXPERIMENT = "22l-6761_A2_Ops"
+
 # OS junk files that are not part of the dataset.
 JUNK_FILES = {".ds_store", "thumbs.db", "desktop.ini"}
 

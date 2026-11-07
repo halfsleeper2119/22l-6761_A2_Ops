@@ -1,12 +1,14 @@
 """Image loading shared by training AND serving.
 
-Both sides must turn a file into pixels in exactly the same way, so this is the only
-place that does it. Task 2 adds resizing here; the Flask/model API imports the same code.
+Training (visionguard/data.py) and the model API both call `load_for_model`, so a file
+becomes pixels in exactly one way. Pixel scaling (e.g. to [-1, 1]) is NOT done here: it is
+the first layer inside each saved model, so the model file carries its own preprocessing.
 """
 import io
 from pathlib import Path
 from typing import Union
 
+import numpy as np
 from PIL import Image, ImageOps
 
 # Allow large camera photos, but still refuse absurd "decompression bomb" files.
@@ -40,3 +42,15 @@ def open_rgb(source: Union[str, Path, bytes]) -> Image.Image:
     with Image.open(source) as im:
         im.load()
         return to_rgb(im)
+
+
+def load_for_model(source: Union[str, Path, bytes], img_size: int) -> np.ndarray:
+    """File/bytes -> float32 array of shape (img_size, img_size, 3) with values 0..255.
+
+    The image is resized straight to a square ("squashed"), so the aspect ratio is NOT kept.
+    We avoid letterbox padding on purpose: in this dataset AI images are mostly square and
+    real photos are not, so padding bars would appear almost only on real photos and give
+    the model a shortcut that has nothing to do with image content.
+    """
+    im = open_rgb(source).resize((img_size, img_size), Image.Resampling.BILINEAR)
+    return np.asarray(im, dtype=np.float32)

@@ -210,11 +210,103 @@ git push
 
 ---
 
-## When Task 1 is done
+---
 
-Send me:
+# Tasks 2 and 3: models and experiment tracking
 
-1. The output of `check_env.py`, so the Docker image can use matching versions.
-2. The audit, split and EDA console output, so we can write the interpretations.
+## Step A. Switch MLflow to 2.x (2 min)
 
-Task 2 (tf.data pipeline and models) comes next. Start it while you write up Task 1.
+`requirements.txt` now pins `mlflow>=2.19,<3`. MLflow 3 logs models through new server endpoints that hosted servers such as DagsHub may not support, and 2.x is the safe choice. With `.venv` active:
+
+```
+pip install -r requirements.txt
+```
+
+This downgrades MLflow, and pandas with it. That is expected.
+
+## Step B. Quick evidence scripts (15 min)
+
+```
+python scripts\show_batch.py                      # Task 2.1 figure: reports\figures\augmented_batch.png
+python scripts\toy_keras_tuner.py                 # Task 2.7 toy: Fashion-MNIST tuner table
+python scripts\toy_mlflow.py --lr 0.001 --local   # Task 3.1: two local runs
+python scripts\toy_mlflow.py --lr 0.01 --local
+mlflow ui --backend-store-uri ./mlruns            # open http://127.0.0.1:5000, Ctrl+C to stop
+```
+
+📸 In the MLflow UI, tick both runs and click **Compare**. Screenshot the run list, one run page, and the comparison view.
+
+Next, the same toy run on DagsHub (Task 3.2). Fill in `.env` first:
+
+```
+python scripts\toy_mlflow.py --lr 0.001
+git check-ignore -v .env                          # 📸 proof that .env is git-ignored
+```
+
+📸 Screenshot the toy run on DagsHub: Experiments tab, then the run.
+
+## Step C. All training runs (40 to 80 min, can run unattended)
+
+```
+.\scripts\run_experiments.ps1
+```
+
+It runs 8 trainings in a row and logs each one to DagsHub. Three of them are registered in the model registry. At the end it prints a comparison table, also saved to `reports\tables\runs_comparison.md`. Every run's figures go to `reports\runs\<run-name>\`:
+
+| File | Used for |
+|---|---|
+| `curves.png` | 2.3 / 2.4: loss and accuracy curves, with the best epoch and the fine-tuning start marked |
+| `model_summary.txt` | 2.2: output shape and parameter count per layer |
+| `trainable_layers*.txt` | 2.3: trainable layers in stage 1 and stage 2 |
+| `confusion_matrix.png`, `roc_curve.png`, `metrics.json` | 2.5 |
+| `misclassified.png` | 2.6: the 10 most confident mistakes |
+
+What each run changes, against its neighbour:
+
+| Run | Change |
+|---|---|
+| cnn_lr1e-3 | Baseline CNN |
+| cnn_lr3e-4 | Learning rate |
+| cnn_noaug | No augmentation |
+| cnn_autolog | Same as baseline, but logged with MLflow autolog (Task 3.3) |
+| mnv2_160 | MobileNetV2 transfer learning, frozen then last block fine-tuned |
+| mnv2_160_frozen | Backbone never unfrozen |
+| mnv2_128 | Image size 128 |
+| effb0_160 | EfficientNetB0 backbone |
+
+Then the tuner (Task 2.7, 20 to 40 min):
+```
+python scripts\tune.py
+```
+
+## Step D. Registry (10 min)
+
+```
+python scripts\registry.py list                   # versions with their test scores
+python scripts\registry.py promote --version <N>  # N = the best run (by validation AUC)
+python scripts\predict_champion.py data\raw\<some folder>\<some image>
+python scripts\registry.py export                 # writes models\champion.keras for serving
+```
+
+📸 Screenshot the DagsHub Models page showing the versions and the alias, and the terminal output of `predict_champion.py`.
+
+## Design decisions to explain in the report
+
+- **Image size 160:** MobileNetV2 has ImageNet weights at 160, and it is about twice as fast as 224 on CPU.
+- **Aspect ratio:** every image is squashed to 160x160, so aspect ratio is not kept. We deliberately avoid padding. AI images here are mostly square and real photos are not, so padding bars would appear almost only on real photos and give the model a shortcut.
+- **Pillow decoding inside tf.data:** we decode with Pillow through `tf.numpy_function`. It handles WebP, animated GIF, transparency and EXIF rotation, and it is the same function the API will use (Task 4.1).
+- **Pipeline stages:** decode → resize → cache → shuffle → batch → augment (training only) → prefetch.
+- **Augmentation:** flip, ±18° rotation, 10% zoom and 10% contrast. We avoid blur, noise and re-compression, because those change exactly the traces that separate AI images from real ones.
+- **Scaling lives inside the model:** pixel scaling is the model's first layer (`Rescaling`). For MobileNetV2 that layer is exactly `preprocess_input`, mapping pixels to [-1, 1], because the backbone was trained on that range. EfficientNet does its own scaling internally. The `.keras` file is therefore self-contained.
+- **Loss and output:** binary cross-entropy with one sigmoid output gives the probability that an image is AI. We use Adam and track accuracy, AUC, precision and recall.
+- **Fine-tuning:** stage 2 unfreezes only the last block, at a learning rate about 100x smaller. BatchNorm layers stay frozen, so roughly 700 images can't overwrite the statistics they learned on ImageNet.
+- **Callbacks:** EarlyStopping (patience 5, restores the best weights), ModelCheckpoint (best `val_loss`), and ReduceLROnPlateau (halves the learning rate after 2 flat epochs). Seeds are fixed with `keras.utils.set_random_seed(42)`.
+- **Threshold:** chosen on **validation** data, never on test. Calling a real photo fake is the worse error, because it wrongly accuses a genuine photo. So we pick the threshold that catches the most AI images while flagging at most 10% of real photos (`--max-fpr`). The test set is evaluated once, with that threshold.
+- **Manual logging vs autolog (Task 3.3):**
+  - Our manual callback logs exactly what we choose: our parameters, per-epoch metrics including the learning rate, and our tags.
+  - Autolog captures more without any code: every `fit()` and optimizer setting, EarlyStopping details, model summary, TensorBoard logs and checkpoints.
+  - Autolog misses our own parameters (augmentation, image size, backbone), the git and DVC tags, and anything that happens after `fit()`. Test metrics and the threshold only appear because our code logs them.
+
+## When Tasks 2 and 3 are done
+
+Send me `reports\tables\runs_comparison.md`, the tuner table and the champion run's `metrics.json` (it lists the misclassified images). We'll write the evaluation, error analysis and comparison paragraphs from them, then build the Flask app.
