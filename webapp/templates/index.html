@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Is this image AI-generated?</h1>
+<p class="sub">Upload a photo or picture and VisionGuard will estimate whether it was made by a generative AI model.</p>
+<form class="card" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+  <div class="drop">
+    <strong>Choose an image</strong>
+    <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,image/*" required>
+    <div class="hint">JPG, PNG, WebP, GIF or BMP &middot; up to {{ max_mb|round(0)|int }} MB &middot; the image is analysed in memory and never stored</div>
+  </div>
+  <p style="margin:18px 0 0"><button type="submit">Analyse image</button></p>
+</form>
+<p class="hint">Every analysis is recorded (file name, verdict, confidence, model version, time) on the <a href="{{ url_for('history') }}">History</a> page.</p>
+{% endblock %}

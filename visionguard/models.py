@@ -58,7 +58,7 @@ def unfreeze_top(base: keras.Model, backbone: str, n_layers: int = None) -> int:
     BatchNormalization layers stay frozen: re-estimating their statistics on ~700 images
     would destroy what they learned on ImageNet. Returns the number of unfrozen layers."""
     if n_layers is None:
-        names = [l.name for l in base.layers]
+        names = [layer.name for layer in base.layers]
         start = names.index(LAST_BLOCK_START[backbone])
     else:
         start = max(0, len(base.layers) - n_layers)
@@ -75,10 +75,10 @@ def trainable_report(model: keras.Model) -> str:
     lines = []
     for layer in model.layers:
         sub = layer.layers if isinstance(layer, keras.Model) else [layer]
-        for l in sub:
-            if l.trainable_weights:
-                n = sum(int(w.numpy().size) for w in l.trainable_weights)
-                lines.append(f"{l.name:<35} {n:>10,}")
+        for sub_layer in sub:
+            if sub_layer.trainable_weights:
+                n = sum(int(w.numpy().size) for w in sub_layer.trainable_weights)
+                lines.append(f"{sub_layer.name:<35} {n:>10,}")
     total = sum(int(w.numpy().size) for w in model.trainable_weights)
     return "\n".join(lines + [f"{'TOTAL trainable params':<35} {total:>10,}"])
 

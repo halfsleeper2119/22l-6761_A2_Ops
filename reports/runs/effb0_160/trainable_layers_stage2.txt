@@ -1,0 +1,8 @@
+block7a_expand_conv                    221,184
+block7a_dwconv                          10,368
+block7a_se_reduce                       55,344
+block7a_se_expand                       56,448
+block7a_project_conv                   368,640
+top_conv                               409,600
+p_ai                                     1,281
+TOTAL trainable params               1,122,865

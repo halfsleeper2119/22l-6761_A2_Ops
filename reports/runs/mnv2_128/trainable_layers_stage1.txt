@@ -1,0 +1,2 @@
+p_ai                                     1,281
+TOTAL trainable params                   1,281

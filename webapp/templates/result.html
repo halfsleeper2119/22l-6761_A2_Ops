@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ p.label_text }} - VisionGuard{% endblock %}
+{% block content %}
+<h1>Result</h1>
+<p class="sub">{{ filename }}</p>
+<div class="card result">
+  <img src="{{ preview }}" alt="Uploaded image preview">
+  <div>
+    <p class="verdict">{{ p.label_text }}</p>
+    <div>Confidence {{ '%.1f'|format(p.confidence * 100) }}%</div>
+    <div class="meter" aria-hidden="true"><span style="width: {{ '%.1f'|format(p.confidence * 100) }}%"></span></div>
+    <dl>
+      <dt>P(AI-generated)</dt><dd>{{ '%.3f'|format(p.p_ai) }}</dd>
+      <dt>Decision threshold</dt><dd>{{ '%.3f'|format(p.threshold) }} (AI if P &ge; threshold)</dd>
+      <dt>Model</dt><dd>{{ p.model_name }} v{{ p.model_version }}</dd>
+      <dt>Served by</dt><dd>{{ source }}</dd>
+      <dt>Inference time</dt><dd>{{ '%.0f'|format(p.latency_ms) }} ms</dd>
+      <dt>Logged</dt><dd>#{{ row.id }} at {{ row.created_at|localtime }}</dd>
+    </dl>
+    <div class="caveat">
+      <strong>Treat this as a hint, not proof.</strong> The model was trained on about 1,000 web images and is
+      wrong on roughly 1 in 4 test images. Edited photos, screenshots, paintings and heavily compressed
+      images are especially easy to misjudge. Never accuse someone of faking an image on this result alone.
+    </div>
+    <p style="margin-top:18px"><a class="btn" href="{{ url_for('index') }}">Analyse another</a>
+       <a class="btn secondary" href="{{ url_for('history') }}">View history</a></p>
+  </div>
+</div>
+{% endblock %}

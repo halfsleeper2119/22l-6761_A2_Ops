@@ -1,0 +1,111 @@
+{
+  "run_name": "cnn_lr3e-4",
+  "best_epoch": 1,
+  "threshold": 0.4888761341571808,
+  "test": {
+    "accuracy": 0.5374149659863946,
+    "precision": 0.7407407407407407,
+    "recall": 0.24691358024691357,
+    "f1": 0.37037037037037035,
+    "roc_auc": 0.6840628507295173,
+    "false_positive_rate": 0.10606060606060606,
+    "tn": 59,
+    "fp": 7,
+    "fn": 61,
+    "tp": 20
+  },
+  "val": {
+    "accuracy": 0.5616438356164384,
+    "precision": 0.8148148148148148,
+    "recall": 0.2716049382716049,
+    "f1": 0.4074074074074074,
+    "roc_auc": 0.6381766381766381,
+    "false_positive_rate": 0.07692307692307693,
+    "tn": 60,
+    "fp": 5,
+    "fn": 59,
+    "tp": 22
+  },
+  "misclassified": [
+    {
+      "n": 1,
+      "path": "data/raw/AiArtData/AiArtData/tsia-navigating-ai-landscape-blog-hero.png",
+      "true": "ai",
+      "p_ai": 0.481,
+      "width": 850,
+      "height": 450
+    },
+    {
+      "n": 2,
+      "path": "data/raw/AiArtData/AiArtData/mouse-in-a-maze.jpg",
+      "true": "ai",
+      "p_ai": 0.481,
+      "width": 1080,
+      "height": 600
+    },
+    {
+      "n": 3,
+      "path": "data/raw/AiArtData/AiArtData/jesus-dunking-scaled.jpg",
+      "true": "ai",
+      "p_ai": 0.482,
+      "width": 2560,
+      "height": 1950
+    },
+    {
+      "n": 4,
+      "path": "data/raw/AiArtData/AiArtData/ai-art-prompt-8.png",
+      "true": "ai",
+      "p_ai": 0.483,
+      "width": 2560,
+      "height": 2519
+    },
+    {
+      "n": 5,
+      "path": "data/raw/AiArtData/AiArtData/Deepfake-AI-generated-2023.jpg",
+      "true": "ai",
+      "p_ai": 0.483,
+      "width": 1280,
+      "height": 1000
+    },
+    {
+      "n": 6,
+      "path": "data/raw/AiArtData/AiArtData/2A8oNV0baUgW9iGIEk1X.jpg",
+      "true": "ai",
+      "p_ai": 0.483,
+      "width": 400,
+      "height": 400
+    },
+    {
+      "n": 7,
+      "path": "data/raw/AiArtData/AiArtData/maxresdefault3.jpg",
+      "true": "ai",
+      "p_ai": 0.484,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "n": 8,
+      "path": "data/raw/AiArtData/AiArtData/1ayKvyXsQfIHS7OOCswZA1g.png",
+      "true": "ai",
+      "p_ai": 0.484,
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "n": 9,
+      "path": "data/raw/AiArtData/AiArtData/Vincent-Favilla-_Pondering_-800x550.jpg",
+      "true": "ai",
+      "p_ai": 0.484,
+      "width": 800,
+      "height": 550
+    },
+    {
+      "n": 10,
+      "path": "data/raw/AiArtData/AiArtData/mmart-fai-102a-art-scale-5-00x.jpg",
+      "true": "ai",
+      "p_ai": 0.485,
+      "width": 1920,
+      "height": 1920
+    }
+  ]
+}

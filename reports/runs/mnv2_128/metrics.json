@@ -1,0 +1,111 @@
+{
+  "run_name": "mnv2_128",
+  "best_epoch": 9,
+  "threshold": 0.6322172284126282,
+  "test": {
+    "accuracy": 0.7551020408163265,
+    "precision": 0.7848101265822784,
+    "recall": 0.7654320987654321,
+    "f1": 0.775,
+    "roc_auc": 0.8322109988776655,
+    "false_positive_rate": 0.25757575757575757,
+    "tn": 49,
+    "fp": 17,
+    "fn": 19,
+    "tp": 62
+  },
+  "val": {
+    "accuracy": 0.773972602739726,
+    "precision": 0.9,
+    "recall": 0.6666666666666666,
+    "f1": 0.7659574468085106,
+    "roc_auc": 0.852801519468186,
+    "false_positive_rate": 0.09230769230769231,
+    "tn": 59,
+    "fp": 6,
+    "fn": 27,
+    "tp": 54
+  },
+  "misclassified": [
+    {
+      "n": 1,
+      "path": "data/raw/AiArtData/AiArtData/tiger4.jpg",
+      "true": "ai",
+      "p_ai": 0.12,
+      "width": 3733,
+      "height": 2133
+    },
+    {
+      "n": 2,
+      "path": "data/raw/AiArtData/AiArtData/3e9bc32a-1d77-4f0a-b0df-199c80060385-1024x1024.jpg",
+      "true": "ai",
+      "p_ai": 0.177,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "n": 3,
+      "path": "data/raw/AiArtData/AiArtData/ai-generated-7768378_1280.jpg",
+      "true": "ai",
+      "p_ai": 0.232,
+      "width": 1280,
+      "height": 1280
+    },
+    {
+      "n": 4,
+      "path": "data/raw/AiArtData/AiArtData/midjourney-putin.jpg",
+      "true": "ai",
+      "p_ai": 0.266,
+      "width": 1024,
+      "height": 576
+    },
+    {
+      "n": 5,
+      "path": "data/raw/AiArtData/AiArtData/ath-flowers-vivid-colors-generative-ai-landscape-painting-mountain-281590810.jpg",
+      "true": "ai",
+      "p_ai": 0.269,
+      "width": 897,
+      "height": 1690
+    },
+    {
+      "n": 6,
+      "path": "data/raw/RealArt/RealArt/3-self-portraits-by-zanele-muholi.jpg",
+      "true": "real",
+      "p_ai": 0.953,
+      "width": 1200,
+      "height": 690
+    },
+    {
+      "n": 7,
+      "path": "data/raw/AiArtData/AiArtData/fdfs2-800x533.jpg",
+      "true": "ai",
+      "p_ai": 0.339,
+      "width": 800,
+      "height": 533
+    },
+    {
+      "n": 8,
+      "path": "data/raw/AiArtData/AiArtData/earing-a-yellow-kimono-in-a-beautiful-and-foggy-tropical-greenh-copy-800x800.jpg",
+      "true": "ai",
+      "p_ai": 0.347,
+      "width": 800,
+      "height": 800
+    },
+    {
+      "n": 9,
+      "path": "data/raw/AiArtData/AiArtData/sddefault.jpg",
+      "true": "ai",
+      "p_ai": 0.35,
+      "width": 640,
+      "height": 480
+    },
+    {
+      "n": 10,
+      "path": "data/raw/RealArt/RealArt/images108.jpg",
+      "true": "real",
+      "p_ai": 0.896,
+      "width": 300,
+      "height": 168
+    }
+  ]
+}

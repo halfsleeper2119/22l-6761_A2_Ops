@@ -1,0 +1,11 @@
+conv1                                      864
+bn1                                         64
+conv2                                   18,432
+bn2                                        128
+conv3                                   73,728
+bn3                                        256
+conv4                                  294,912
+bn4                                        512
+dense                                   16,448
+p_ai                                        65
+TOTAL trainable params                 405,409

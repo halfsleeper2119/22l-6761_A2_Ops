@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}History - VisionGuard{% endblock %}
+{% block content %}
+<h1>History</h1>
+<p class="sub">Every analysis, newest first: what was decided, when, by which model, and how confidently.</p>
+<div class="stats">
+  <div><b>{{ stats.total }}</b>analyses</div>
+  <div><b>{{ stats.ai }}</b>judged AI</div>
+  <div><b>{{ stats.real }}</b>judged real</div>
+</div>
+{% if rows %}
+<div class="card scroll" style="padding:0">
+<table>
+  <thead><tr><th>#</th><th>When</th><th>File</th><th>Verdict</th><th>Confidence</th><th>P(AI)</th>
+             <th>Model</th><th>Served by</th><th>ms</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.created_at|localtime }}</td>
+      <td class="name">{{ r.filename }}</td>
+      <td><span class="tag {{ r.label }}">{{ 'AI' if r.label == 'ai' else 'Real' }}</span></td>
+      <td>{{ '%.1f'|format(r.confidence * 100) }}%</td>
+      <td>{{ '%.3f'|format(r.p_ai) }}</td>
+      <td>{{ r.model_name }} v{{ r.model_version }}</td>
+      <td>{{ r.inference_source }}</td>
+      <td>{{ '%.0f'|format(r.latency_ms) }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="card">No analyses yet. <a href="{{ url_for('index') }}">Upload an image</a> to create the first entry.</div>
+{% endif %}
+{% endblock %}

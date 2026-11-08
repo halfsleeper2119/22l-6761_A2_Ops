@@ -310,3 +310,54 @@ python scripts\registry.py export                 # writes models\champion.keras
 ## When Tasks 2 and 3 are done
 
 Send me `reports\tables\runs_comparison.md`, the tuner table and the champion run's `metrics.json` (it lists the misclassified images). We'll write the evaluation, error analysis and comparison paragraphs from them, then build the Flask app.
+
+---
+
+# Tasks 4 and 5: Flask app and database
+
+## Step E. Install and configure (5 min)
+
+```
+pip install -r requirements.txt
+python -m pytest -q
+```
+14 tests should pass. They use a fake model, so they will also run in CI later.
+
+Add these lines to `.env`. Leave `THRESHOLD` and `MODEL_VERSION` empty, so the app reads them from `models\champion.txt`, which `registry.py export` wrote:
+```
+INFERENCE_MODE=local
+MODEL_PATH=models/champion.keras
+THRESHOLD=
+MODEL_VERSION=
+DATABASE_URL=sqlite:///visionguard.db
+MAX_UPLOAD_MB=5
+PORT=8000
+```
+
+## Step F. Run it
+
+```
+python run_web.py
+```
+Open http://127.0.0.1:8000.
+
+📸 Screenshots to take:
+- **4.1:** the console line `[inference] loaded champion.keras ... in X s`. It appears once at start-up, not per request. Also take two results: one AI image and one real image from the test split (see `data\splits\test.csv`).
+- **4.2:** the three failure pages: a `.txt` file renamed to `.png` gives "Image could not be read"; a `.pdf` or `.txt` gives "Unsupported file type"; an image over 5 MB gives "File too large".
+- **4.3:** the upload page, a result page, and the History page.
+- **4.4:** http://127.0.0.1:8000/health, plus the console line showing `debug=False`.
+- **5:** the History page after 5 or more uploads.
+
+## Design points for the report
+
+- **One shared inference module** (`visionguard/inference.py`). It loads the model **once** at start-up. Loading per request would re-read the file and rebuild the TensorFlow graph on every upload, which takes about 1 second each time and wastes memory.
+- **Same preprocessing as training.** Both use `preprocess.load_for_model`, and pixel scaling is a layer inside the model, so serving can't drift from training.
+- **Three validation checks**, because each one alone can be fooled:
+  - the file extension
+  - the size limit, enforced by `MAX_CONTENT_LENGTH` before the body is read
+  - a real decode with Pillow, which catches renamed or truncated files
+- **Filename sanitizing:** `secure_filename` turns a name like `../../etc/passwd.png` into `etc_passwd.png`.
+- **Nothing on disk:** a custom `InMemoryRequest` stops Werkzeug from spooling uploads larger than 500 KB to temporary files. The preview is embedded in the result page as base64.
+- **Configuration and production serving:** every setting comes from environment variables. The app runs under **waitress** with debug off, because Flask's debug server exposes an interactive debugger and full tracebacks to anyone.
+- **Database:** SQLAlchemy, with `DATABASE_URL` choosing SQLite locally or PostgreSQL in Docker. Each row stores the time (UTC), sanitized filename, verdict, confidence, P(AI), threshold, model name and version, which server answered, and latency.
+- **`INFERENCE_MODE=remote`** makes the same app call the cloud model API instead (Task 8). The model API is `run_api.py` / `model_api/`.

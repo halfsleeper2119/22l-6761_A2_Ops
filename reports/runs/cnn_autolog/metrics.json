@@ -1,0 +1,111 @@
+{
+  "run_name": "cnn_autolog",
+  "best_epoch": 5,
+  "threshold": 0.5088286399841309,
+  "test": {
+    "accuracy": 0.5782312925170068,
+    "precision": 0.7714285714285715,
+    "recall": 0.3333333333333333,
+    "f1": 0.46551724137931033,
+    "roc_auc": 0.7072577628133183,
+    "false_positive_rate": 0.12121212121212122,
+    "tn": 58,
+    "fp": 8,
+    "fn": 54,
+    "tp": 27
+  },
+  "val": {
+    "accuracy": 0.5616438356164384,
+    "precision": 0.8148148148148148,
+    "recall": 0.2716049382716049,
+    "f1": 0.4074074074074074,
+    "roc_auc": 0.6670465337132003,
+    "false_positive_rate": 0.07692307692307693,
+    "tn": 60,
+    "fp": 5,
+    "fn": 59,
+    "tp": 22
+  },
+  "misclassified": [
+    {
+      "n": 1,
+      "path": "data/raw/AiArtData/AiArtData/tsia-navigating-ai-landscape-blog-hero.png",
+      "true": "ai",
+      "p_ai": 0.402,
+      "width": 850,
+      "height": 450
+    },
+    {
+      "n": 2,
+      "path": "data/raw/AiArtData/AiArtData/Vincent-Favilla-_Pondering_-800x550.jpg",
+      "true": "ai",
+      "p_ai": 0.419,
+      "width": 800,
+      "height": 550
+    },
+    {
+      "n": 3,
+      "path": "data/raw/AiArtData/AiArtData/2A8oNV0baUgW9iGIEk1X.jpg",
+      "true": "ai",
+      "p_ai": 0.421,
+      "width": 400,
+      "height": 400
+    },
+    {
+      "n": 4,
+      "path": "data/raw/AiArtData/AiArtData/Psychedelic-AI-Dreaming-In-Cosmic-Horror-Style-41916264-1.png",
+      "true": "ai",
+      "p_ai": 0.44,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "n": 5,
+      "path": "data/raw/AiArtData/AiArtData/AI-music-video.png",
+      "true": "ai",
+      "p_ai": 0.443,
+      "width": 1200,
+      "height": 802
+    },
+    {
+      "n": 6,
+      "path": "data/raw/AiArtData/AiArtData/mouse-in-a-maze.jpg",
+      "true": "ai",
+      "p_ai": 0.444,
+      "width": 1080,
+      "height": 600
+    },
+    {
+      "n": 7,
+      "path": "data/raw/AiArtData/AiArtData/1ayKvyXsQfIHS7OOCswZA1g.png",
+      "true": "ai",
+      "p_ai": 0.447,
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "n": 8,
+      "path": "data/raw/AiArtData/AiArtData/jesus-dunking-scaled.jpg",
+      "true": "ai",
+      "p_ai": 0.448,
+      "width": 2560,
+      "height": 1950
+    },
+    {
+      "n": 9,
+      "path": "data/raw/AiArtData/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png",
+      "true": "ai",
+      "p_ai": 0.452,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "n": 10,
+      "path": "data/raw/AiArtData/AiArtData/maxresdefault3.jpg",
+      "true": "ai",
+      "p_ai": 0.454,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

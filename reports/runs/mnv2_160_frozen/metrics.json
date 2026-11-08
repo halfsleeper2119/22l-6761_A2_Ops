@@ -1,0 +1,111 @@
+{
+  "run_name": "mnv2_160_frozen",
+  "best_epoch": 16,
+  "threshold": 0.7696962356567383,
+  "test": {
+    "accuracy": 0.7346938775510204,
+    "precision": 0.8620689655172413,
+    "recall": 0.6172839506172839,
+    "f1": 0.7194244604316546,
+    "roc_auc": 0.8540965207631873,
+    "false_positive_rate": 0.12121212121212122,
+    "tn": 58,
+    "fp": 8,
+    "fn": 31,
+    "tp": 50
+  },
+  "val": {
+    "accuracy": 0.6643835616438356,
+    "precision": 0.8636363636363636,
+    "recall": 0.4691358024691358,
+    "f1": 0.608,
+    "roc_auc": 0.7834757834757833,
+    "false_positive_rate": 0.09230769230769231,
+    "tn": 59,
+    "fp": 6,
+    "fn": 43,
+    "tp": 38
+  },
+  "misclassified": [
+    {
+      "n": 1,
+      "path": "data/raw/AiArtData/AiArtData/240201-airec-main-ksp-5625e8.jpg",
+      "true": "ai",
+      "p_ai": 0.055,
+      "width": 760,
+      "height": 380
+    },
+    {
+      "n": 2,
+      "path": "data/raw/AiArtData/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png",
+      "true": "ai",
+      "p_ai": 0.226,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "n": 3,
+      "path": "data/raw/AiArtData/AiArtData/ath-flowers-vivid-colors-generative-ai-landscape-painting-mountain-281590810.jpg",
+      "true": "ai",
+      "p_ai": 0.233,
+      "width": 897,
+      "height": 1690
+    },
+    {
+      "n": 4,
+      "path": "data/raw/AiArtData/AiArtData/midjourney-putin.jpg",
+      "true": "ai",
+      "p_ai": 0.285,
+      "width": 1024,
+      "height": 576
+    },
+    {
+      "n": 5,
+      "path": "data/raw/AiArtData/AiArtData/tsia-navigating-ai-landscape-blog-hero.png",
+      "true": "ai",
+      "p_ai": 0.314,
+      "width": 850,
+      "height": 450
+    },
+    {
+      "n": 6,
+      "path": "data/raw/AiArtData/AiArtData/59e0ba50419705a2c4b22681fb.jpg",
+      "true": "ai",
+      "p_ai": 0.382,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "n": 7,
+      "path": "data/raw/AiArtData/AiArtData/ai-generated-animal-crossbreeds-09.jpg",
+      "true": "ai",
+      "p_ai": 0.383,
+      "width": 750,
+      "height": 750
+    },
+    {
+      "n": 8,
+      "path": "data/raw/AiArtData/AiArtData/Vincent-Favilla-_Pondering_-800x550.jpg",
+      "true": "ai",
+      "p_ai": 0.42,
+      "width": 800,
+      "height": 550
+    },
+    {
+      "n": 9,
+      "path": "data/raw/AiArtData/AiArtData/ugly-AI-1-1.jpg",
+      "true": "ai",
+      "p_ai": 0.428,
+      "width": 1061,
+      "height": 732
+    },
+    {
+      "n": 10,
+      "path": "data/raw/AiArtData/AiArtData/Bashenga_10-1-1000x552.jpg",
+      "true": "ai",
+      "p_ai": 0.463,
+      "width": 1000,
+      "height": 552
+    }
+  ]
+}

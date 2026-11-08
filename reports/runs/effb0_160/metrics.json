@@ -1,0 +1,111 @@
+{
+  "run_name": "effb0_160",
+  "best_epoch": 43,
+  "threshold": 0.7857444286346436,
+  "test": {
+    "accuracy": 0.782312925170068,
+    "precision": 0.9152542372881356,
+    "recall": 0.6666666666666666,
+    "f1": 0.7714285714285715,
+    "roc_auc": 0.8679386457164235,
+    "false_positive_rate": 0.07575757575757576,
+    "tn": 61,
+    "fp": 5,
+    "fn": 27,
+    "tp": 54
+  },
+  "val": {
+    "accuracy": 0.7054794520547946,
+    "precision": 0.88,
+    "recall": 0.5432098765432098,
+    "f1": 0.6717557251908397,
+    "roc_auc": 0.8319088319088319,
+    "false_positive_rate": 0.09230769230769231,
+    "tn": 59,
+    "fp": 6,
+    "fn": 37,
+    "tp": 44
+  },
+  "misclassified": [
+    {
+      "n": 1,
+      "path": "data/raw/AiArtData/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png",
+      "true": "ai",
+      "p_ai": 0.068,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "n": 2,
+      "path": "data/raw/AiArtData/AiArtData/240201-airec-main-ksp-5625e8.jpg",
+      "true": "ai",
+      "p_ai": 0.092,
+      "width": 760,
+      "height": 380
+    },
+    {
+      "n": 3,
+      "path": "data/raw/AiArtData/AiArtData/Group_12467.jpg",
+      "true": "ai",
+      "p_ai": 0.104,
+      "width": 1548,
+      "height": 776
+    },
+    {
+      "n": 4,
+      "path": "data/raw/AiArtData/AiArtData/chayka_ai_copyright.jpg",
+      "true": "ai",
+      "p_ai": 0.117,
+      "width": 1500,
+      "height": 1500
+    },
+    {
+      "n": 5,
+      "path": "data/raw/AiArtData/AiArtData/wp-image-940-16849365973x2.jpg",
+      "true": "ai",
+      "p_ai": 0.153,
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "n": 6,
+      "path": "data/raw/AiArtData/AiArtData/3e9bc32a-1d77-4f0a-b0df-199c80060385-1024x1024.jpg",
+      "true": "ai",
+      "p_ai": 0.287,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "n": 7,
+      "path": "data/raw/AiArtData/AiArtData/tsia-navigating-ai-landscape-blog-hero.png",
+      "true": "ai",
+      "p_ai": 0.345,
+      "width": 850,
+      "height": 450
+    },
+    {
+      "n": 8,
+      "path": "data/raw/AiArtData/AiArtData/ath-flowers-vivid-colors-generative-ai-landscape-painting-mountain-281590810.jpg",
+      "true": "ai",
+      "p_ai": 0.351,
+      "width": 897,
+      "height": 1690
+    },
+    {
+      "n": 9,
+      "path": "data/raw/AiArtData/AiArtData/Julian-van-Dieken_A-Girl-With-Glowing-Earrings-.png",
+      "true": "ai",
+      "p_ai": 0.393,
+      "width": 652,
+      "height": 815
+    },
+    {
+      "n": 10,
+      "path": "data/raw/AiArtData/AiArtData/chicken-1024x683.jpg",
+      "true": "ai",
+      "p_ai": 0.405,
+      "width": 1024,
+      "height": 683
+    }
+  ]
+}

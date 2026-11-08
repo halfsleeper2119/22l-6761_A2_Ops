@@ -1,0 +1,6 @@
+block_16_expand                        153,600
+block_16_depthwise                       8,640
+block_16_project                       307,200
+Conv_1                                 409,600
+p_ai                                     1,281
+TOTAL trainable params                 880,321

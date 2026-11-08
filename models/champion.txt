@@ -1,0 +1,4 @@
+model=22l-6761_A2_Ops_visionguard
+version=4
+run=mnv2_128
+threshold=0.6322
