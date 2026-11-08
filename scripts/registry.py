@@ -34,12 +34,17 @@ def main():
     client = MlflowClient()
 
     if a.action == "list":
+        try:
+            champ = client.get_model_version_by_alias(REGISTERED_MODEL_NAME, ALIAS).version
+        except Exception:
+            champ = None
         for v in sorted(client.search_model_versions(f"name='{REGISTERED_MODEL_NAME}'"),
                         key=lambda v: int(v.version)):
             run = client.get_run(v.run_id)
-            print(f"version {v.version}: run '{run.info.run_name}'  aliases={list(v.aliases)}  "
-                  f"test_f1={run.data.metrics.get('test_f1', float('nan')):.3f}  "
-                  f"test_roc_auc={run.data.metrics.get('test_roc_auc', float('nan')):.3f}")
+            print(f"version {v.version}: run '{run.info.run_name}'  "
+                    f"aliases={list(v.aliases) or ([ALIAS] if str(v.version) == str(champ) else [])}  "
+                    f"test_f1={run.data.metrics.get('test_f1', float('nan')):.3f}  "
+                    f"test_roc_auc={run.data.metrics.get('test_roc_auc', float('nan')):.3f}")
 
     elif a.action == "promote":
         if not a.version:
