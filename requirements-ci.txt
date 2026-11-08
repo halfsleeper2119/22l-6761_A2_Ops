@@ -1,0 +1,10 @@
+# Lightweight dependencies for CI tests (the tests use a fake model, no TensorFlow needed)
+flask
+waitress
+sqlalchemy
+pillow
+numpy
+requests
+python-dotenv
+pytest
+ruff

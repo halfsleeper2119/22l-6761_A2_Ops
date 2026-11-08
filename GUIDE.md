@@ -361,3 +361,158 @@ Open http://127.0.0.1:8000.
 - **Configuration and production serving:** every setting comes from environment variables. The app runs under **waitress** with debug off, because Flask's debug server exposes an interactive debugger and full tracebacks to anyone.
 - **Database:** SQLAlchemy, with `DATABASE_URL` choosing SQLite locally or PostgreSQL in Docker. Each row stores the time (UTC), sanitized filename, verdict, confidence, P(AI), threshold, model name and version, which server answered, and latency.
 - **`INFERENCE_MODE=remote`** makes the same app call the cloud model API instead (Task 8). The model API is `run_api.py` / `model_api/`.
+
+---
+
+# Task 6: Docker, Compose and CI
+
+Install **Docker Desktop**, start it, and wait for "Engine running". Check with `docker version`.
+
+## 6.1 Warm-up with a ready-made image (15 min)
+
+📸 Take a screenshot after each block.
+```
+docker run -d --name web1 -p 8080:80 nginx:alpine           # run + port mapping; open http://localhost:8080
+mkdir site; "<h1>Hello from a volume - 22l-6761</h1>" | Set-Content site\index.html
+docker run -d --name web2 -p 8081:80 -v ${PWD}\site:/usr/share/nginx/html:ro nginx:alpine   # volume; open :8081
+docker logs web1                                             # logs (refresh :8080 first)
+docker exec -it web1 sh                                      # shell inside; try: ls /etc/nginx ; whoami ; exit
+docker ps -a                                                 # list containers
+docker stop web1 web2; docker rm web1 web2                   # remove containers
+docker images; docker rmi nginx:alpine                       # list and remove images
+Remove-Item -Recurse site
+```
+
+Definitions, in your own words:
+- **Image:** a read-only template (OS files, libraries, app).
+- **Container:** a running instance of an image.
+- **Layer:** one cached filesystem step of an image, one per Dockerfile instruction.
+- **Volume:** storage that lives outside the container and survives its removal.
+- **Port mapping:** host port → container port, so the outside world can reach the app.
+
+## 6.2 to 6.5 The project stack
+
+Add the Postgres settings and an API key to `.env`. Choose your own password; it's only for your local database:
+```
+@"
+
+POSTGRES_USER=visionguard
+POSTGRES_PASSWORD=ChooseAStrongPassword123
+POSTGRES_DB=visionguard
+API_KEY=PasteALongRandomStringHere
+"@ | Add-Content -Encoding ascii .env
+```
+For a random API key, run: `python -c "import secrets; print(secrets.token_urlsafe(32))"`
+
+Build and start (the first build downloads TensorFlow, so it takes 5 to 10 min):
+```
+docker compose up -d --build
+docker compose ps                                   # 📸 web "healthy" and db "healthy" (wait ~1 min)
+```
+Open http://localhost:8000 and upload a few images. The History page now reads from **PostgreSQL**.
+
+📸 Evidence:
+```
+docker compose exec web whoami                      # -> app   (non-root user)
+docker compose exec web id
+Test-NetConnection localhost -Port 5432             # TcpTestSucceeded : False  -> DB port closed to the outside
+docker compose exec db psql -U visionguard -c "SELECT id, created_at, label, confidence, model_version FROM predictions;"
+```
+
+**6.4 Image size:**
+```
+docker image ls visionguard                          # 📸 AFTER size
+docker history visionguard:latest                    # 📸 which layers are largest (the pip install layer)
+docker build -f docker/Dockerfile.naive -t visionguard:naive .
+docker image ls visionguard                          # 📸 naive (BEFORE) next to latest (AFTER)
+docker rmi visionguard:naive
+```
+For the report: the BEFORE image uses the full `python:3.12` base, the full dev requirements (with full `tensorflow`, mlflow, dvc, matplotlib) and keeps the pip cache. The AFTER image uses `python:3.12-slim`, serving-only packages with `tensorflow-cpu`, a multi-stage build, no pip cache and a `.dockerignore`.
+
+**6.5 Operations:**
+```
+docker compose stop; docker compose start; docker compose restart web
+docker compose logs --tail 30 web
+docker compose logs --tail 30 db
+docker compose exec web sh          # look around: ls /app ; exit
+docker compose exec db sh           # exit
+```
+Break something on purpose (missing model file), then diagnose it from the logs only:
+```
+Rename-Item models\champion.keras champion.keras.bak
+docker compose restart web
+docker compose ps                   # web keeps restarting / unhealthy
+docker compose logs --tail 20 web   # 📸 FileNotFoundError: Model file not found: /app/models/champion.keras
+Rename-Item models\champion.keras.bak champion.keras
+docker compose restart web
+docker compose ps                   # 📸 healthy again
+```
+
+Design points for the report:
+- **Instruction order:** dependencies are installed before the source code is copied. That `pip install` layer (about 600 MB) is reused from cache whenever only code changes, so a rebuild takes seconds.
+- **No secrets in the image:** `.dockerignore` excludes `.env`, and passwords reach the containers only through Compose `environment:` at run time. Each service gets only the variables it needs, so the DagsHub token never enters a container.
+- **Model mounted, not built in:** it is mounted read-only from `./models`. The model is versioned in the MLflow registry rather than in Git, and swapping champions needs only `registry.py export` plus a restart, with no rebuild. CI can also build the image without the model file.
+- **Database wiring:** `db` publishes no port. `web` reaches it by its service name (`@db:5432`) on Compose's internal network, and `depends_on: condition: service_healthy` waits for `pg_isready`.
+- **`tensorflow-cpu`:** the same API without the CUDA/GPU libraries, because the servers we deploy to have no GPU.
+
+## 6.6 GitHub Actions
+
+**Toy:**
+1. Create a new empty GitHub repo, e.g. `22l-6761_A2_Ops_ci_toy`.
+2. Copy the *contents* of the `ci-toy` folder into it (`calc.py`, `test_calc.py`, `.github/workflows/ci.yml`), commit and push. The repo's **Actions** tab shows a green run for both Python versions. 📸
+3. Break it: change `return a + b` to `return a - b`, push. 📸 Red run.
+4. Fix it back and push. 📸 Green run.
+
+**Project:** `.github/workflows/ci.yml` is already in your repo. Every push runs ruff, then pytest, then `docker build`. 📸 Screenshot the green run, and the badge at the top of `README.md` on GitHub.
+
+**Secrets:** workflow secrets are stored in the repo under **Settings → Secrets and variables → Actions** and used as `${{ secrets.NAME }}`. Writing them in the workflow file would publish them to anyone who can read the repo, and they would stay in Git history forever. Our CI needs no secrets.
+
+---
+
+# Task 7: deploy the model API (Hugging Face Spaces, Pathway C)
+
+**Why this platform:** it's free and needs no card. It builds our Dockerfile in the cloud and gives a public HTTPS URL. Our model API is one container, which a Docker Space runs directly.
+
+| Compose element | Spaces equivalent |
+|---|---|
+| `api` service | the Space's container, built from `deploy/hf_space/Dockerfile` |
+| `ports: 8001` | `app_port: 8001` in the Space README; Hugging Face puts HTTPS on port 443 in front |
+| `.env` API_KEY | a Space **secret** (Settings → Variables and secrets) |
+| `./models` volume | the model is copied into the image, because a Space has no host folder to mount |
+| `db` | not needed in the cloud: the local Flask app (Task 8) logs to its own database |
+
+1. Create an account at https://huggingface.co, then a **Write** token at https://huggingface.co/settings/tokens.
+2. Deploy:
+   ```
+   pip install huggingface_hub
+   python scripts\deploy_hf_space.py --hf-user <your-hf-username> --token <hf-write-token>
+   ```
+   📸 The script output shows the staged files, the Space page and the API URL.
+3. Open the Space page and its **Logs** tab. Wait until the build finishes and the log shows `VisionGuard model API on http://0.0.0.0:8001`, and the status shows **Running** (5–10 min). 📸 the build log, the Running status, and Settings → Variables and secrets showing `API_KEY` as a secret, with its value hidden.
+4. Open `https://<api-url>/health` in a browser. 📸
+
+**Postman tests** (📸 each response, with the status code and time visible):
+
+| Test | Request | Expected |
+|---|---|---|
+| Health | `GET {{url}}/health` | 200, model version 4, threshold 0.632 |
+| Real image | `POST {{url}}/predict`; Headers `X-API-Key: <API_KEY>`; Body → form-data, key `image` (type **File**) | 200, a prediction JSON |
+| AI image | same, with an AI test image | 200 |
+| No key | same, without the header | 401 `missing or invalid API key` |
+| Wrong type | form-data `image` = a `.txt` file | 415 |
+
+For a mobile-data test (a different network): turn on your phone hotspot, connect the laptop, and repeat one request. Or open `/health` in your phone's browser.
+
+# Task 8: local Flask calls the cloud API
+
+In `.env`, change these lines (`code .env`):
+```
+INFERENCE_MODE=remote
+MODEL_API_URL=https://<your-api-url>
+MODEL_API_KEY=<same value as API_KEY>
+```
+Then run `python run_web.py`. The startup log no longer loads a model, and the page footer shows `inference: remote (<your-api-host>)`.
+
+Upload at least 5 images, a mix of real and AI. 📸 each result: "Served by" shows the cloud host. Then 📸 the History page, whose "Served by" column shows the cloud host, and `/health`, which now includes a `model_api` block showing `reachable: true`.
+
+When you're done, set `INFERENCE_MODE=local` again if you want the local model back.

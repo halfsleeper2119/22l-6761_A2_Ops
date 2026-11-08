@@ -1,0 +1,10 @@
+# Task 6.4 "BEFORE" image, kept only to measure the size difference. Do not use.
+# Full Debian Python base, the whole development requirements (full tensorflow, mlflow,
+# dvc, matplotlib, keras-tuner, ...), pip cache kept, single stage, runs as root.
+FROM python:3.12
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+ENV HOST=0.0.0.0 PORT=8000
+CMD ["python", "run_web.py"]

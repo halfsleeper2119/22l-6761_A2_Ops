@@ -1,0 +1,65 @@
+# Task 6.3 - VisionGuard stack.   docker compose up -d --build
+#
+# db   PostgreSQL, named volume, health check, NO published port (only reachable inside
+#      Compose's network, by the service name "db").
+# web  Flask UI + local inference; starts only after db is healthy; published on :8000.
+# api  (optional, profile "api") the model API that is deployed to the cloud in Task 7:
+#      docker compose --profile api up -d
+#
+# Passwords come from the untracked .env file (see .env.example). We pass only the variables
+# each service needs, so the DagsHub token in .env never enters a container.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-visionguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-visionguard}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build: .
+    image: visionguard:latest
+    environment:
+      INFERENCE_MODE: local
+      MODEL_PATH: /app/models/champion.keras
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-visionguard}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-visionguard}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-5}
+      PORT: "8000"
+    volumes:
+      # The champion model is MOUNTED read-only, not built into the image: the model is
+      # versioned in the MLflow registry (not Git), swapping champions needs only
+      # `registry.py export` + restart, and CI can build the image without the model file.
+      - ./models:/app/models:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    image: visionguard:latest
+    profiles: ["api"]
+    command: ["python", "run_api.py"]
+    environment:
+      MODEL_PATH: /app/models/champion.keras
+      API_KEY: ${API_KEY:?set API_KEY in .env}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-5}
+      PORT: "8001"
+    volumes:
+      - ./models:/app/models:ro
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

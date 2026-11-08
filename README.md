@@ -1,8 +1,17 @@
 # VisionGuard
 
+[![CI](https://github.com/halfsleeper2119/22l-6761_A2_Ops/actions/workflows/ci.yml/badge.svg)](https://github.com/halfsleeper2119/22l-6761_A2_Ops/actions/workflows/ci.yml)
+
 Web service that classifies an uploaded image as AI-generated or real.
 TensorFlow/Keras model, experiments tracked with MLflow on DagsHub, Flask UI,
 PostgreSQL request log, Docker Compose, cloud-hosted model API.
+
+Run everything with one command (needs Docker and a `.env` copied from `.env.example`, plus the
+champion model in `models/` from `python scripts/registry.py export`):
+
+```
+docker compose up -d --build      # then open http://localhost:8000
+```
 
 Step-by-step instructions: see `GUIDE.md`.
 

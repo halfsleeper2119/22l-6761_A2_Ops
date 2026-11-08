@@ -16,6 +16,9 @@ mlartifacts/
 models/*.keras
 *.h5
 
+# Local SQLite database from run_web.py
+*.db
+
 # Keras Tuner trial folders
 tuner/
 
@@ -25,3 +28,4 @@ tuner/
 
 # NOTE: data/raw and data/clean are NOT listed here on purpose.
 # `dvc add` writes its own data/.gitignore for them.
+deploy/_build/
